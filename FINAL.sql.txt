@@ -1,0 +1,118 @@
+--ASH
+/*Task 1*/
+SELECT Description,
+       course_no,
+       to_char(cost, '$9,999') AS cost
+FROM course
+WHERE cost < (SELECT AVG(cost) FROM course)
+ORDER BY cost DESC;
+/*Task 2*/
+SELECT DISTINCT c.course_no,
+                c.description,
+                c.cost,
+                s.start_date_time
+FROM course c
+JOIN section s ON c.course_no = s.course_no
+ORDER BY c.course_no, c.description;
+/*Task 3*/
+SELECT Z.ZIP, 
+       COUNT(I.INSTRUCTOR_ID) AS Instructor_Count
+FROM ZIPCODE Z
+LEFT JOIN INSTRUCTOR I ON Z.ZIP = I.ZIP
+GROUP BY Z.ZIP;
+/*Task 4*/
+SELECT s.student_id,
+       s.first_name,
+       s.last_name,
+       s.street_address,
+       z.state,
+       z.zip
+FROM Student s
+JOIN Zipcode z ON s.zip = z.zip
+WHERE z.city = 'Brooklyn';
+/*Task 5*/
+SELECT i.first_name, 
+       i.last_name, 
+       COUNT(s.section_id) AS num_sections
+FROM instructor i
+LEFT JOIN section s ON i.instructor_id = s.instructor_id
+GROUP BY i.instructor_id, i.first_name, i.last_name
+ORDER BY num_sections DESC;
+/*Task 6*/
+SELECT FIRST_NAME, 
+       LAST_NAME, 
+       STREET_ADDRESS, 
+       ZIP 
+FROM STUDENT 
+WHERE ZIP = 10025;
+/*Task 7*/
+SELECT student_id, 
+       salutation, 
+       first_name, 
+       last_name
+FROM student
+WHERE registration_date < '02-23-1999';
+/*Task 8*/
+SELECT s.student_id
+FROM Student s
+LEFT JOIN Enrollment e ON s.student_id = e.student_id
+WHERE e.student_id IS NULL;
+/*Task 9*/
+CREATE OR REPLACE VIEW all_people_view AS
+SELECT salutation, 
+       first_name || ' ' || last_name AS full_name, 
+       street_address, 
+       zip, 
+       phone
+FROM student
+UNION ALL
+SELECT salutation, 
+       first_name || ' ' || last_name AS full_name, 
+       street_address, 
+       zip, 
+       phone
+FROM instructor;
+/*Task 10*/
+SELECT s.student_id, s.first_name, s.last_name
+FROM student s
+JOIN enrollment e ON s.student_id = e.student_id
+ORDER BY e.final_grade DESC
+FETCH FIRST 1 ROW ONLY;
+/*Task 11*/
+SELECT C.course_no,
+       C.description,
+       COUNT(S.section_no) AS number_of_sections
+FROM Course C
+JOIN Section S ON C.course_no = S.course_no
+GROUP BY C.course_no, C.description
+HAVING COUNT(S.section_no) > 5;
+/*Task 12*/
+SELECT c.course_no AS "Course No",
+       c.description AS "Course Description",
+       c.cost AS "Cost",
+       p.course_no AS "Prerequisite No",
+       p.description AS "Prerequisite Description"
+FROM course c
+LEFT JOIN course p ON c.prerequisite = p.course_no;
+/*Task 13*/
+SELECT C.course_no,
+       C.description,
+       COUNT(S.course_no) AS number_of_sections
+FROM Course C
+JOIN Section S ON C.course_no = S.course_no
+GROUP BY C.course_no, C.description
+ORDER BY number_of_sections DESC;
+/*Task 14*/
+SELECT S.COURSE_NO,
+       C.DESCRIPTION,
+       S.START_DATE_TIME,
+       S.CAPACITY,
+       COUNT(E.STUDENT_ID) AS NO_OF_STUDENTS_ENROLLED
+FROM ENROLLMENT E
+JOIN SECTION S ON S.SECTION_ID = E.SECTION_ID
+JOIN COURSE C ON C.COURSE_NO = S.COURSE_NO
+GROUP BY S.COURSE_NO,
+         C.DESCRIPTION,
+         S.START_DATE_TIME,
+         S.CAPACITY
+HAVING COUNT(E.STUDENT_ID) > S.CAPACITY;
